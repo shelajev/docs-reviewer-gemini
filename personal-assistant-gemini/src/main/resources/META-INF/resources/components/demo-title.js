@@ -39,10 +39,10 @@ export class DemoTitle extends LitElement {
     render() {
         return html`
             <div class="title">
-                <h1>Gemini Personal Assistant</h1>
+                <h1>Docs Reviewer Demo</h1>
             </div>
             <div class="explanation">
-                This demo introduces Gemini Personal Assistant
+                This is a demo application that can review your documents!
             </div>
             
             <div class="explanation">
@@ -51,7 +51,7 @@ export class DemoTitle extends LitElement {
             
             <div class="explanation">
                 <ol>
-                    You must login with Google first before you can interact with the Personal Assistant
+                    You must login with Google first before you can interact with the Docs Reviewer
                 </ol>
             </div>
             

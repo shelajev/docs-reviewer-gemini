@@ -1,0 +1,9 @@
+services:
+   mcp-gdrive-sse:
+    image: olegselajev241/mcp-gdrive-sse:latest
+    ports:
+      - "8000:8000"
+      - "8001:8001"
+    environment:
+      - GOOGLE_CLIENT_ID=54127830651-it44hsm3j97jtjcrqsilqplft725vtto.apps.googleusercontent.com
+      - GOOGLE_CLIENT_SECRET=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
