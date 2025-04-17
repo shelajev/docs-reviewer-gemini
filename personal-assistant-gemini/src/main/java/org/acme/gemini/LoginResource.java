@@ -1,5 +1,9 @@
 package org.acme.gemini;
 
+import io.quarkus.oidc.AccessTokenCredential;
+import io.quarkus.oidc.client.Tokens;
+import io.quarkus.oidc.token.propagation.AccessToken;
+import io.quarkus.security.identity.SecurityIdentity;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.logging.Logger;
@@ -28,6 +32,9 @@ public class LoginResource {
     JsonWebToken idToken;
 
     @Inject
+    SecurityIdentity identity;
+
+    @Inject
     Template assistant;
 
     @Inject
@@ -47,8 +54,10 @@ public class LoginResource {
 
     private void sendTokenToInternalService() {
         try {
-            log.infof("Posting token via propagation to internal service...");
-            TokenRequest tokenPayload = new TokenRequest(idToken.getRawToken());
+            String accessToken = identity.getCredential(AccessTokenCredential.class).getToken();
+            log.infof("Posting token via propagation to internal service... " + accessToken);
+
+            TokenRequest tokenPayload = new TokenRequest(accessToken);
             Response response = gdriveMCPAuthClient.sendToken(tokenPayload);
 
             if (response.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL) {

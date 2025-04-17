@@ -46,7 +46,7 @@ export class DemoTitle extends LitElement {
             </div>
             
             <div class="explanation">
-                <img src="images/chatbot-architecture.png"/>
+                <img src="images/architecture.png"/>
             </div>
             
             <div class="explanation">

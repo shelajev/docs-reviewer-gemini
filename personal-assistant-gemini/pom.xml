@@ -51,17 +51,8 @@
             <artifactId>quarkus-websockets-next</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-rest-client-oidc-token-propagation</artifactId>
-        </dependency>
-        <dependency>
             <groupId>io.quarkiverse.langchain4j</groupId>
-            <artifactId>quarkus-langchain4j-oidc-model-auth-provider</artifactId>
-            <version>${quarkus-langchain4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.quarkiverse.langchain4j</groupId>
-            <artifactId>quarkus-langchain4j-vertex-ai-gemini</artifactId>
+            <artifactId>quarkus-langchain4j-ai-gemini</artifactId>
             <version>${quarkus-langchain4j.version}</version>
         </dependency>
         <!-- UI -->

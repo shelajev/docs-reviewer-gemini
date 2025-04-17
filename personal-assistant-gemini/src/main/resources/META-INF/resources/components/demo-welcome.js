@@ -1,13 +1,14 @@
 import {LitElement, html, css} from 'lit';
-import {state} from 'lit/decorators.js';
 
 export class DemoWelcome extends LitElement {
 
-    @state()
-    private _query: string = '';
-
-    @state()
-    private _results: Array<{ title: string, fileId: string }> = [];
+    static properties = {
+        _query: { state: true },
+        _results: { state: true }
+    };
+    
+    _query = '';
+    _results = [];
 
     static styles = css`
       h1 {
@@ -91,26 +92,27 @@ export class DemoWelcome extends LitElement {
       }
     `
     
-    private _handleInput(e: Event) {
-        this._query = (e.target as HTMLInputElement).value;
+    _handleInput(e) {
+        this._query = e.target.value;
     }
 
-    private async _search() {
+    async _search() {
         if (!this._query.trim()) return;
 
-        // Replace with actual backend call
         console.log("Searching for:", this._query);
         try {
-            // Example: const response = await fetch('/api/search', { method: 'POST', body: JSON.stringify({ query: this._query }), headers: {'Content-Type': 'application/json'} });
-            // const data = await response.json();
-            // this._results = data;
-
-            // Placeholder results
-            this._results = [
-                { title: "Document A.txt", fileId: "doc_a_123" },
-                { title: "Meeting Notes B.docx", fileId: "notes_b_456" },
-                { title: "Project Plan C.pdf", fileId: "plan_c_789" }
-            ];
+            const response = await fetch('/docs/search', { 
+                method: 'POST', 
+                body: JSON.stringify({ query: this._query }), 
+                headers: {'Content-Type': 'application/json'} 
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            console.log("docs found: " + data);
+            this._results = data;
+            this.requestUpdate(); // Force update
 
         } catch (error) {
             console.error("Search failed:", error);
@@ -118,13 +120,13 @@ export class DemoWelcome extends LitElement {
         }
     }
     
-    private _handleKeyDown(e: KeyboardEvent) {
+    _handleKeyDown(e) {
         if (e.key === 'Enter') {
             this._search();
         }
     }
     
-    private _handleFileClick(fileId: string) {
+    _handleFileClick(fileId) {
         // Replace with actual navigation logic
         console.log("Navigate to file:", fileId);
         // Example: window.location.href = `/file/${fileId}`; 
@@ -137,7 +139,6 @@ export class DemoWelcome extends LitElement {
             </div>
             
             <div class="explanation">
-                <img src="images/chatbot-architecture.png"/>
                 <p>
                     This application helps you review documents stored in your Google Drive. 
                     Enter a search query related to the documents you want to find. 

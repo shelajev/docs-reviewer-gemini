@@ -4,11 +4,19 @@ package org.acme.gemini;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
 import io.quarkiverse.langchain4j.RegisterAiService;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.SessionScoped;
 
+import java.util.List;
+
 @RegisterAiService()
-@SessionScoped
+@ApplicationScoped
 public interface DocsService {
+    record ReviewResult(String markdown, List<Finding> findings) {}
+    record Finding(String issue_type, String desc, String text, String change, String suggestion) {}
+
+    public record GoogleDocument(String title, String fileId){};
+
     @SystemMessage("""
             Here are the instructions for what to do when you're asked to "review a text":
     
@@ -23,9 +31,42 @@ public interface DocsService {
                 8. Document should clearly define accountability, who should sign off and who should execute the solution.
                 9. Document must atleast have a structure of executive summary, problem statement and solution proposal.
             Always apply every point of the list above to the text given for the review.
-            Review the following text and return all findings as a collection of json objects named 'findings', containing issue type labelled 'issue_type', description labelled 'desc', the text containing the issue labelled 'text', proposed change labelled 'change' if possible include a replacement text suggestion labelled 'suggestion';
+            
+            Review the following text and return a json that corresponds to the following structure: 
+            
+            record ReviewResult(String markdown, List<Finding> findings) {}
+            record Finding(String issue_type, String desc, String text, String change, String suggestion) {}
+              
+           <important>
+              DO NOT OUTPUT ```json 
+              DO NOT END OUTPUT with ```
+              
+              Do not output anything except valid json!
+              </important>
             
             You have access to an MCP server for Google Drive access. When you're asked to find a document, it means to search for it in the Google Drive.
-               """)
+
+            The query user searched for to find the document you need to review is in the "user message"; 
+            If you think you need a file id to read the document, search for it using the tools available!
+            
+            You can search GDrive MCP for the doc, obtain it file Id and use that to read the file!
+            """)
     String review(@UserMessage String question);
+
+    @SystemMessage("""
+            You need to search user's GDrive for the files that match the query.
+            
+            Return the found docs in json that maps into: 
+            List<GoogleDocument> list;  
+            where GoogleDocument is record GoogleDocument(String title, String fileId){};
+
+            DO NOT return any other text than the json object.
+            DO NOT include ```json at the beginning of the json object.
+            DO NOT include ``` at the end of the json object.
+            
+            The query to use is in the User message part.
+            """)
+    String search(@UserMessage String query);
+
+
 }
