@@ -7,6 +7,8 @@ services:
        - .env
      environment:
        - QUARKUS_HTTP_HOST=localhost
+       - GDRIVEMCP_AUTH_API_URL=http://localhost:8001/
+       - GDRIVEMCP_URL=http://mcp-gdrive-sse:8000/sse
    mcp-gdrive-sse:
     image: olegselajev241/mcp-gdrive-sse:latest
     ports:
