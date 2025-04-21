@@ -24,3 +24,6 @@ This demo introduces Docs reviewer with Gemini Demo application.
 4.  Open your browser and navigate to `http://localhost:3000`.
 
 
+
+
+This project is inspired and forked from https://github.com/sberyozkin/quarkus-langchain4j-gemini
