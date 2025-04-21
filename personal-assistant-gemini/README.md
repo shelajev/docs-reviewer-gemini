@@ -1,39 +1,26 @@
-# Personal Assistant Gemini Demo
+# Docs reviewer with Gemini Demo
 
-This demo introduces Personal Assistant Gemini.
+This demo introduces Docs reviewer with Gemini Demo application.
 
-## OpenId Connect authentication
+## Running the application
 
-This demo requires users to authenticate with Google.
+1.  Create a `.env` file in the project root with the necessary environment variables. It should contain the following keys:
+    ```dotenv
+    GOOGLE_CLIENT_ID=<your_google_client_id>
+    GOOGLE_CLIENT_SECRET=<your_google_client_secret>
+    GOOGLE_PROJECT_ID=<your_google_project_id>
+    GOOGLE_AI_API_KEY=<your_google_ai_api_key>
+    ```
+    Refer to `.env.example` if available, or consult the application's configuration documentation for details on obtaining these values.
+    **Important:** Ensure your Google OAuth application is configured with `http://localhost:3000` as an authorized redirect URI.
+2.  Build the application and the container image:
+    ```bash
+    mvn verify -Dquarkus.container-image.build=true
+    ```
+3.  Start the application using Docker Compose:
+    ```bash
+    docker compose up
+    ```
+4.  Open your browser and navigate to `http://localhost:3000`.
 
-You have to register an application with Google, follow steps listed in the [Quarkus Google](https://quarkus.io/guides/security-openid-connect-providers#google) section.
 
-Name your Google application as `Quarkus LangChain4j AI`, and make sure an allowed callback URL is set to `http://localhost:8080/login`.
-Google will generate a client id and secret, use them to set `quarkus.oidc.client-id` and `quarkus.oidc.credentials.secret` properties.
-You must also enable Vertex AI API in your Google Cloud project.
-
-## Vertex AI Gemini
-
-Vertex AI Gemini model is configured as follows:
-
-```properties
-quarkus.langchain4j.vertexai.gemini.location=europe-west2
-quarkus.langchain4j.vertexai.gemini.project-id=${GOOGLE_PROJECT_ID}
-quarkus.langchain4j.vertexai.gemini.log-requests=true
-quarkus.langchain4j.vertexai.gemini.log-responses=true
-```
-
-Set `GOOGLE_PROJECT_ID` to the id of your Google Cloud project.
-
-Note that the current user access token which is time constrained and can be refreshed will be used to access Gemini.
-No API keys are configured.
-
-## Running the Demo
-
-To run the demo, use the following commands:
-
-```shell
-mvn quarkus:dev
-```
-
-Access `http://localhost:8080`, login to Quarkus with Google, and follow a provided application link and request Gemini to assist with providing information about your scheduled events and helping to schedule new events.
