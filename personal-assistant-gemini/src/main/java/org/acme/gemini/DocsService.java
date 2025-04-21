@@ -54,9 +54,10 @@ public interface DocsService {
     String review(@UserMessage String question);
 
     @SystemMessage("""
-            You need to search user's GDrive for the files that match the query.
+            You're an assitant and you have access to tools. 
+            Search for the asked query in the Google Drive files.  
             
-            Return the found docs in json that maps into: 
+            Return the found docs in a json that maps into: 
             List<GoogleDocument> list;  
             where GoogleDocument is record GoogleDocument(String title, String fileId){};
 

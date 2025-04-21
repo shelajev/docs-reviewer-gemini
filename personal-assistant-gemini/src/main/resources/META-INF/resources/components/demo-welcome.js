@@ -127,9 +127,8 @@ export class DemoWelcome extends LitElement {
     }
     
     _handleFileClick(fileId) {
-        // Replace with actual navigation logic
-        console.log("Navigate to file:", fileId);
-        // Example: window.location.href = `/file/${fileId}`; 
+        // Navigate to the review page for the clicked file
+        window.location.href = `/docs/review/${fileId}`;
     }
 
     render() {

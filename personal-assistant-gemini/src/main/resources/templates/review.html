@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Document Review</title>
+    <!-- Include Quill stylesheet -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <style>
+        body { height: 100vh; margin: 0; font-family: sans-serif; } /* Removed display: flex */
+        #suggestions-container { width: 100%; padding: 1em; overflow-y: auto; background-color: #f8f8f8; } /* Changed width to 100% */
+        pre { white-space: pre-wrap; word-wrap: break-word; background-color: #eee; padding: 10px; border-radius: 4px; }
+        .finding { margin-bottom: 1.5em; border: 1px solid #ddd; padding: 1em; border-radius: 5px; background-color: #fff; }
+        .finding h3 { margin-top: 0; color: #333; }
+        .finding p { margin-bottom: 0.5em; line-height: 1.4; }
+        .finding strong { color: #555; }
+    </style>
+</head>
+<body>
+    <div id="suggestions-container">
+        <h2>Suggestions</h2>
+        <!-- Suggestions will be loaded here dynamically -->
+        <div id="findings-list"></div>
+    </div>
+
+    <!-- Hidden div to store JSON data -->
+    <div id="review-data" data-review-result='{reviewResultJson}' style="display:none;"></div>
+
+    <!-- Initialize Quill editor -->
+    {| 
+    <script>
+      // Get findings data from Qute model
+      // const reviewResultData = {reviewResult.raw}; // Use .raw to output the Java object directly for JSON processing
+      // const suggestionsData = reviewResultData.findings; // Access the findings array
+
+      // Get JSON string from data attribute and parse it
+      const reviewDataElement = document.getElementById('review-data');
+      const reviewResultJsonString = reviewDataElement.getAttribute('data-review-result');
+      let suggestionsData = [];
+      let reviewResultData = {}; // Initialize reviewResultData
+
+      try {
+          reviewResultData = JSON.parse(reviewResultJsonString);
+          suggestionsData = reviewResultData.findings || []; // Safely access findings
+      } catch (e) {
+          console.error("Error parsing review result JSON:", e);
+          // Optionally display an error message to the user in findingsListContainer
+          document.getElementById('findings-list').textContent = "Error loading review data.";
+      }
+
+      const findingsListContainer = document.getElementById('findings-list');
+
+      // Check if suggestionsData is an array and not empty
+      if (Array.isArray(suggestionsData) && suggestionsData.length > 0) {
+        suggestionsData.forEach(finding => {
+            const findingDiv = document.createElement('div');
+            findingDiv.className = 'finding';
+
+            const typeHeader = document.createElement('h3');
+            typeHeader.textContent = finding.issue_type || 'Finding'; // Use 'Finding' as fallback
+            findingDiv.appendChild(typeHeader);
+
+            // Helper function to create and append paragraph if data exists
+            const addParagraph = (label, text) => {
+                if (text) {
+                    const p = document.createElement('p');
+                    p.innerHTML = `<strong>${label}:</strong> ${text}`; // Use innerHTML to render potential simple formatting
+                    findingDiv.appendChild(p);
+                }
+            };
+
+            addParagraph('Description', finding.desc);
+            addParagraph('Relevant Text', finding.text ? `<code>${finding.text}</code>` : null); // Wrap text in code tag
+            addParagraph('Suggested Change', finding.change);
+            addParagraph('Suggestion', finding.suggestion);
+
+            findingsListContainer.appendChild(findingDiv);
+        });
+      } else {
+         findingsListContainer.textContent = "No findings found or data is in an unexpected format.";
+         console.error("Error processing suggestions JSON or no findings:", reviewResultData);
+      }
+
+    </script>
+     |}
+</body>
+</html> 

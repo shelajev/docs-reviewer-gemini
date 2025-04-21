@@ -3,12 +3,14 @@ package org.acme.gemini;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
 import java.util.List;
-
 
 import org.eclipse.microprofile.jwt.Claims;
 import org.eclipse.microprofile.jwt.JsonWebToken;
@@ -22,6 +24,8 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
 import java.io.IOException;
+import io.quarkus.qute.Template;
+import io.quarkus.qute.TemplateInstance;
 
 @Authenticated
 @Path("/docs")
@@ -31,6 +35,9 @@ public class DocsResource {
 
     private final DocsService assistant;
     private final ObjectMapper objectMapper;
+
+    @Inject
+    Template review;
 
     public DocsResource(DocsService assistant, ObjectMapper objectMapper) {
         this.assistant = assistant;
@@ -56,8 +63,46 @@ public class DocsResource {
         }
     }
 
-    public record SearchQuery(String query) {}
+    @GET
+    @Path("/review/{fileId}")
+    @Produces(MediaType.TEXT_HTML)
+    public TemplateInstance reviewDocument(@PathParam("fileId") String fileId) {
+        String reviewJson = assistant.review(fileId);
+        log.infof("received raw response: %s", reviewJson);
 
+        // Find the start and end of the JSON object
+        int startIndex = reviewJson.indexOf('{');
+        int endIndex = reviewJson.lastIndexOf('}');
+
+        if (startIndex != -1 && endIndex != -1 && startIndex < endIndex) {
+            String extractedJson = reviewJson.substring(startIndex, endIndex + 1);
+            log.infof("extracted json: %s", extractedJson);
+            try {
+                // Parse the JSON response into ReviewResult object
+                ReviewResult result = objectMapper.readValue(extractedJson, ReviewResult.class);
+
+                // Serialize the result object back to a JSON string for the frontend
+                String reviewResultJsonString = objectMapper.writeValueAsString(result);
+
+                // Render the template with the result object AND the JSON string
+                return review
+                    .data("reviewResult", result) // Keep for markdown
+                    .data("reviewResultJson", reviewResultJsonString); // Add JSON string
+
+            } catch (Exception e) {
+                // Handle potential JSON parsing or serialization errors
+                log.error("Error processing review response", e);
+                // Ideally, return an error template instance
+                // For now, throwing a web application exception
+                throw new WebApplicationException("Error processing review response", 500);
+            }
+        } else {
+            log.errorf("Could not find valid JSON object in the response: %s", reviewJson);
+            throw new WebApplicationException("Could not extract valid JSON from review response", 500);
+        }
+    }
+
+    public record SearchQuery(String query) {}
 
     @Inject
     SecurityIdentity identity;
@@ -82,5 +127,8 @@ public class DocsResource {
 
     }
 
+    // Define records matching DocsService output
+    record ReviewResult(String markdown, List<Finding> findings) {}
+    record Finding(String issue_type, String desc, String text, String change, String suggestion) {}
 
 }
