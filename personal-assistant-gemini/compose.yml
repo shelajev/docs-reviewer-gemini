@@ -1,4 +1,12 @@
 services:
+   app:
+     image: shelajev/personal-assistant-gemini:1.0-SNAPSHOT
+     ports:
+       - 3000:3000
+     env_file:
+       - .env
+     environment:
+       - QUARKUS_HTTP_HOST=localhost
    mcp-gdrive-sse:
     image: olegselajev241/mcp-gdrive-sse:latest
     ports:

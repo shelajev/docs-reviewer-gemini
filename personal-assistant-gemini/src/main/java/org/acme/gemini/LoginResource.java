@@ -1,8 +1,6 @@
 package org.acme.gemini;
 
 import io.quarkus.oidc.AccessTokenCredential;
-import io.quarkus.oidc.client.Tokens;
-import io.quarkus.oidc.token.propagation.AccessToken;
 import io.quarkus.security.identity.SecurityIdentity;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
