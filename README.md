@@ -4,6 +4,8 @@ This demo introduces Docs reviewer with Gemini Demo application.
 
 ## Running the application
 
+
+0. google oauth app should have callback url: `http://localhost:3000/login`
 1.  Create a `.env` file in the project root with the necessary environment variables. It should contain the following keys:
     ```dotenv
     GOOGLE_CLIENT_ID=<your_google_client_id>
